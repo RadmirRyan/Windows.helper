@@ -84,7 +84,7 @@ api_groq = 'ваш_ключ_groq_здесь'
 
 Выполните команду:
 
-text
+
 python aksa_assistant.py
 ⚙️ Первая настройка
 При первом запуске программа запросит:
@@ -104,7 +104,7 @@ python aksa_assistant.py
 Голосовой ввод (дополнительная настройка):
 Для голосового ввода можно использовать Windows Speech Recognition или установить дополнительные библиотеки:
 
-text
+
 pip install SpeechRecognition
 pip install pyaudio
 Затем добавьте в код функцию для распознавания речи с микрофона.
