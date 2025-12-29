@@ -138,7 +138,7 @@ while True:
             hh = input()
             if hh:
                 try:
-                    os.remove(f'C:\\Users\\radmi\\Downloads\\{hh}')
+                    os.remove(f'C:\\Users\\{name}\\Downloads\\{hh}')
                     txt = f'{name}, успешно удалила файл {gr}'
                 except:
                     txt = f'{name}, не получилось удалить файл. Проверь, есть ли такой файл?'
@@ -313,7 +313,7 @@ while True:
             hf = requests.get('https://vk.com/audio')
             if hf.status_code == 200:
                 try:
-                    webbrowser.open('https://vk.com/audios535092072?section=all')
+                    webbrowser.open('https://vk.com/audios') # Получи ссылку в vk.com/audios - мой плейлист
                     txt = f'{name}, включила твой плейлист в VK музыке. Приятного прослушивания!'
                 except:
                     txt = f'Ой, {name}! Кажется, произошла ошибка. Простите, пожалуйста!'
@@ -322,7 +322,7 @@ while True:
                     qf = requests.get('https://music.yandex.ru')
                     if qf.status_code == 200:
                         try:
-                            webbrowser.open('https://music.yandex.ru/playlists/lk.7e25fe93-dc18-4970-b912-7643d2be0430')
+                            webbrowser.open('https://music.yandex.ru/playlists/') # Получи ссылку в music.yandex.com/playlists - мой плейлист
                             txt = f'{name}, включила твой плейлист в VK музыке. Приятного прослушивания!'
                         except:
                             txt = f'Ой, {name}! Кажется, произошла ошибка. Простите, пожалуйста!'
