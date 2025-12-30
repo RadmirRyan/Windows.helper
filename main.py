@@ -61,6 +61,8 @@ if token:
         th2.start()
     except:
         print('Ой! Не получилось запустить телеграм бота')
+else:
+    print('Введи токен бота')
 while True:
     ac = input('Ваше имя: ')
     if ac:
