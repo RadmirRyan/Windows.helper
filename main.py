@@ -12,57 +12,57 @@ name = ''
 api_comet = ''
 api_groq = ''
 action_micro = False
-token = 'ваш токен @BotFather'
-bot = telebot.TeleBot(token)
-@bot.message_handler(commands=['start'])
-def start(m):
-    bot.send_message(m.chat.id, 'Привет! Я aksa, твоя помощница для твоего пк. /info')
-@bot.message_handler(commands=['info'])
-def info(m):
-    bot.send_message(m.chat.id, '1. /open https://your.url.com - открыть ссылку в браузере\n2. /pc_off - выключить пк сейчас.\n3. /pc_offtime (секунды) - выключить пк через n секунд. (/pc_anti - отмена)\n3. /close_all - закроет все вкладки.\nВсе, что вы делаете выполняется на вашем пк.')
-@bot.message_handler(commands=['open'])
-def open(m):
-    txt = m.text.replace('/open').strip()
-    try:
-        webbrowser.open(txt)
-    except:
-        bot.send_message(m.chat.id, 'Ой. Не получилось открыть эту страницу. Проверь валидность ссылки.')
-@bot.message_handler(commands=['pc_off'])
-def pcoff(m):
-    try:
-        os.system('shutdown /s /f /t 0')
-    except:
-        bot.send_message(m.chat.id, 'Ой. Не получилось.')
-@bot.message_handler(commands=['pc_offtime'])
-def pcoft(m):
-    time = m.text.replace('/pc_offtime', '').strip()
-    num = 60
-    try:
-        num = int(time)
-    except:
-        bot.send_message(m.chat.id, 'Введи число')
-    os.system(f'shutdown /s /f /t {num}')
-@bot.message_handler(commands=['pc_anti'])
-def pctimanti(m):
-    try:
-        os.system('shutdown /a')
-    except:
-        bot.send_message(m.chat.id, 'Ой! Ошибка.')
-@bot.message_handler(commands=['close_all'])
-def clall(m):
-    try:
-        os.system('powershell -c "Get-Process | Where-Object {$_.MainWindowTitle} | Stop-Process -Force"')
-    except:
-        bot.send_message(m.chat.id, 'Ой! Ошибка')
+token = ''
 if token:
+    bot = telebot.TeleBot(token)
+    @bot.message_handler(commands=['start'])
+    def start(m):
+        bot.send_message(m.chat.id, 'Привет! Я aksa, твоя помощница для твоего пк. /info')
+    @bot.message_handler(commands=['info'])
+    def info(m):
+        bot.send_message(m.chat.id, '1. /open https://your.url.com - открыть ссылку в браузере\n2. /pc_off - выключить пк сейчас.\n3. /pc_offtime (секунды) - выключить пк через n секунд. (/pc_anti - отмена)\n3. /close_all - закроет все вкладки.\nВсе, что вы делаете выполняется на вашем пк.')
+    @bot.message_handler(commands=['open'])
+    def open(m):
+        txt = m.text.replace('/open').strip()
+        try:
+            webbrowser.open(txt)
+        except:
+            bot.send_message(m.chat.id, 'Ой. Не получилось открыть эту страницу. Проверь валидность ссылки.')
+    @bot.message_handler(commands=['pc_off'])
+    def pcoff(m):
+        try:
+            os.system('shutdown /s /f /t 0')
+        except:
+            bot.send_message(m.chat.id, 'Ой. Не получилось.')
+    @bot.message_handler(commands=['pc_offtime'])
+    def pcoft(m):
+        time = m.text.replace('/pc_offtime', '').strip()
+        num = 60
+        try:
+            num = int(time)
+        except:
+            bot.send_message(m.chat.id, 'Введи число')
+        os.system(f'shutdown /s /f /t {num}')
+    @bot.message_handler(commands=['pc_anti'])
+    def pctimanti(m):
+        try:
+            os.system('shutdown /a')
+        except:
+            bot.send_message(m.chat.id, 'Ой! Ошибка.')
+    @bot.message_handler(commands=['close_all'])
+    def clall(m):
+        try:
+            os.system('powershell -c "Get-Process | Where-Object {$_.MainWindowTitle} | Stop-Process -Force"')
+        except:
+            bot.send_message(m.chat.id, 'Ой! Ошибка')
     try:
         th2 = threading.Thread(target=bot.polling)
         th2.daemon = True
         th2.start()
     except:
-        print('Ой! Не получилось запустить телеграм бота')
+        print('Ой! Не получилось запустить бота.')
 else:
-    print('Введи токен бота')
+    print('Для бота нужен токен.')
 while True:
     ac = input('Ваше имя: ')
     if ac:
