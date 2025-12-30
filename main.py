@@ -8,6 +8,8 @@ import os
 ozvuk = win32com.client.Dispatch('SAPI.SpVoice')
 ozvuk.Rate = 5
 name = ''
+api_comet = ''
+api_groq = ''
 action_micro = False
 while True:
     ac = input('Ваше имя: ')
