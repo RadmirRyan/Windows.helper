@@ -2,13 +2,13 @@ import requests
 import win32com.client
 import threading
 import time
+import speech_recognition as  spr
 import webbrowser
 import os
 ozvuk = win32com.client.Dispatch('SAPI.SpVoice')
 ozvuk.Rate = 5
 name = ''
-api_comet = '' #your api COMET API
-api_groq = '' #your api GROQ API
+action_micro = False
 while True:
     ac = input('Ваше имя: ')
     if ac:
@@ -21,23 +21,40 @@ while True:
                     if 0 < int(spd) <= 10:
                         sped = int(spd)
                         ozvuk.Rate = sped
-                        ozvuk.speak(f'Поняла, {name}! Буду говорить со скоростью {spd}.')
+                        ozvuk.speak(f'Поняла, {name}! Буду говорить со скоростью {spd}. Выбери способ управления.')
                         break
                     else:
-                        ozvuk.speak(f'{name}, я не поняла число. Но я готова продолжить работу. Введи установи скорость для смены скорости.')
+                        ozvuk.speak(f'{name}, я не поняла число. Но я готова продолжить работу. Введи установи скорость для смены скорости. Выбери способ управления.')
                         break
                 except:
                     ozvuk.speak(f'{name}, введи скорость цифрой.')
                     pass
             else:
-                ozvuk.speak(f'{name}, поняла! Оставляю скорость по умолчанию.')
+                ozvuk.speak(f'{name}, поняла! Оставляю скорость по умолчанию. Выбери способ управления.')
                 break
+        ugl = input('Использовать микрофон для команд? ')
+        if 'да' in ugl.lower() or 'yes' in ugl.lower():
+            ozvuk.speak(f'{name}, поняла. Буду слушать.')
+            action_micro = True
+        else:
+            ozvuk.speak(f'{name}, поняла. Оставлю вам ввод через консоль.')
         break
     else:
         ozvuk.speak('Введите имя, пожалуйста...')
 while True:
     txt = ''
-    a = input('')
+    a = ''
+    if action_micro == True:
+        try:
+            mic = spr.Recognizer()
+            with spr.Microphone() as aud_total:
+                aud = mic.listen(aud_total)
+                text = mic.recognize_google(aud, language='ru-RU')
+                a = text
+        except:
+            txt = f'{name}, извините. Не расслышала. Повторите, пожалуйста.'
+    else:
+        a = input('')
     if 'открой' in a.lower() or 'jnrhjq' in a.lower():
         try:
             a = a.replace('открой', '').strip()
@@ -61,12 +78,41 @@ while True:
                         txt = f'Окей, {name}, открываю {a}'
                         webbrowser.open(url)
                     else:
-                        txt = f'Ой, {name}, извините! Произошла какая-то ошибка. Статус равняется {n.status_code}'
+                        url = f'https://www.{a}.com'
+                        b = requests.get(url)
+                        if b.status_code == 200:
+                            txt = f'Окей, {name}, открываю {a}'
+                            webbrowser.open(url)
+                        else:
+                            url = f'https://www.{a}.org'
+                            b = requests.get(url)
+                            if b.status_code == 200:
+                                txt = f'Окей, {name}, открываю {a}'
+                                webbrowser.open(url)
+                            else:
+                                url = f'https://www.{a}.ru'
+                                b = requests.get(url)
+                                if b.status_code == 200:
+                                    txt = f'Окей, {name}, открываю {a}'
+                                    webbrowser.open(url)
+                                else:
+                                    txt = f'{name}, ой. Произошла ошибка. Кажется такого адреса нету.'
         except:
             txt = f'Ой, {name} простите! Произошла ошибка при откртии {a}. Попробуйте еще раз! Проверь адрес или интернет-соединение.'
     elif 'хочу музыку' in a.lower() or 'послушать музыку' in a.lower() or 'музыку' in a.lower():
         ozvuk.speak(f'{name}, что пожелаете? VK музыка или Яндекс музыка? Или может зайцев net?')
-        bc = input()
+        bc = ''
+        if action_micro == True:
+            try:
+                mic = spr.Recognizer()
+                with spr.Microphone() as aud_total:
+                    aud = mic.listen(aud_total)
+                    text = mic.recognize_google(aud, language='ru-RU')
+                    bc = text
+            except:
+                txt = f'{name}, извините. Не расслышала. Повторите, пожалуйста.'
+        else:
+            bc = input()
         try:
             if 'vk' in bc.lower() or 'вк' in bc.lower():
                 url = 'https://vk.com/audio'
@@ -132,7 +178,18 @@ while True:
             txt = f'Ой, {name} простите! Произошла ошибка при откртии {a}. Попробуйте еще раз! Проверь адрес или интернет-соединение.'
     elif 'удали файл' in a.lower() or 'elfkb afqk' in a.lower():
         ozvuk.speak(f'{name}, откуда удалить файл? Я могу удалить с загрузок, если файл не там, то укажи путь для него.')
-        gr = input()
+        gr = ''
+        if action_micro == True:
+            try:
+                mic = spr.Recognizer()
+                with spr.Microphone() as aud_total:
+                    aud = mic.listen(aud_total)
+                    text = mic.recognize_google(aud, language='ru-RU')
+                    gr = text
+            except:
+                txt = f'{name}, извините. Не расслышала. Повторите, пожалуйста.'
+        else:
+            gr = input()
         if 'загрузки' in gr.lower() or 'загрузок' in gr.lower():
             ozvuk.speak(f'Окей, {name}! Укажи название файла.')
             hh = input()
@@ -150,10 +207,32 @@ while True:
                 txt = f'{name}, не получилось удалить файл. Проверь, есть ли такой файл?'
     elif 'найди видео' in a.lower() or 'yfqlb dbltj' in a.lower() or 'поищи видео' in a.lower() or 'хочу посмотреть видео' in a.lower() or 'хочу видео' in a.lower() or 'включи видео' in a.lower():
         ozvuk.speak(f'Окей, {name}! Я найду вам видео, но уточните, пожалуйста, где искать видео? В VK видео или в Rutube?')
-        h = input()
+        h = ''
+        if action_micro == True:
+            try:
+                mic = spr.Recognizer()
+                with spr.Microphone() as aud_total:
+                    aud = mic.listen(aud_total)
+                    text = mic.recognize_google(aud, language='ru-RU')
+                    h = text
+            except:
+                txt = f'{name}, извините. Не расслышала. Повторите, пожалуйста.'
+        else:
+            h = input()
         if 'вк видео' in h.lower() or 'vk видео' in h.lower() or 'vk dbltj' in h.lower() or 'vk video' in h.lower() or 'вк' in h.lower() or 'vk' in h.lower():
             ozvuk.speak(f'Поняла, {name}! Буду искать в VK видео. Пожалуйста, укажи название видео.')
-            k = input()
+            k = ''
+            if action_micro == True:
+                try:
+                    mic = spr.Recognizer()
+                    with spr.Microphone() as aud_total:
+                        aud = mic.listen(aud_total)
+                        text = mic.recognize_google(aud, language='ru-RU')
+                        k = text
+                except:
+                    txt = f'{name}, извините. Не расслышала. Повторите, пожалуйста.'
+            else:
+                k = input()
             if k:
                 try:
                     vlsrjhn = requests.get('https://m.vkvideo.ru')
@@ -177,7 +256,18 @@ while True:
                     txt = f'{name}, произошла ошибка. Простите меня, {name}!'
         elif 'на рутубе' in h.lower() or 'в рутубчике' in h.lower() or 'на рутуб' in h.lower() or 'рутубе' in h.lower() or 'рутуб' in h.lower():
             ozvuk.speak(f'Поняла, {name}! Буду искать в рутубе. Пожалуйста, укажи название видео.')
-            k = input()
+            k = ''
+            if action_micro == True:
+                try:
+                    mic = spr.Recognizer()
+                    with spr.Microphone() as aud_total:
+                        aud = mic.listen(aud_total)
+                        text = mic.recognize_google(aud, language='ru-RU')
+                        k = text
+                except:
+                    txt = f'{name}, извините. Не расслышала. Повторите, пожалуйста.'
+            else:
+                k = input()
             if k:
                 try:
                     vlsrjhn = requests.get('https://rutube.ru')
@@ -200,21 +290,47 @@ while True:
                 except:
                     txt = f'{name}, произошла ошибка. Простите меня, {name}!'
     elif 'установи скорость' in a.lower():
-        a = a.replace('установи скорость', '').strip()
-        if 0 < a <= 10:
+        a = a.lower().replace('установи скорость', '').strip()
+        try:
+            v = int(a)
+        except:
+            v = 5
+        if 0 < v <= 10:
             try:
-                ozvuk.Rate = int(a)
-                txt = f'{name}, поняла вас! Установила скорость {a}'
+                ozvuk.Rate = v
+                txt = f'{name}, поняла вас! Установила скорость {v}'
             except:
                 txt = f'{name}, проверь, точно ли ты ввел число от 1 до 10.'
         else:
             txt = f'{name}, введи число от одного до десяти.'
     elif 'найди песню' in a.lower() or 'yfqlb gtcy.' in a.lower() or 'включи песню' in a.lower() or 'найди музыку' in a.lower() or 'песню' in a.lower() or 'музыку' in a.lower():
         ozvuk.speak(f'{name}, поняла! У вас музыкальное настроение! Могу предложить вам VK музыку или Зайцев net.')
-        vybor = input()
+        vybor = ''
+        if action_micro == True:
+            try:
+                mic = spr.Recognizer()
+                with spr.Microphone() as aud_total:
+                    aud = mic.listen(aud_total)
+                    text = mic.recognize_google(aud, language='ru-RU')
+                    vybor = text
+            except:
+                txt = f'{name}, извините. Не расслышала. Повторите, пожалуйста.'
+        else:
+            vybor = input()
         if 'vk' in vybor.lower() or 'вк' in vybor.lower():
             ozvuk.speak(f'Поняла, {name}! Вы хотите использовать ВК музыку. Напишите мне название песни.') 
-            fgj = input()
+            fgj = ''
+            if action_micro == True:
+                try:
+                    mic = spr.Recognizer()
+                    with spr.Microphone() as aud_total:
+                        aud = mic.listen(aud_total)
+                        text = mic.recognize_google(aud, language='ru-RU')
+                        fgj = text
+                except:
+                    txt = f'{name}, извините. Не расслышала. Повторите, пожалуйста.'
+            else:
+                fgj = input()
             if fgj:
                 try:
                     trn = requests.get('https://vk.com/audio')
@@ -238,7 +354,18 @@ while True:
                     txt = f'{name}, произошла ошибка. Простите, пожалуйста!'
         elif 'зайцев' in vybor.lower() or 'zaycev' in vybor.lower():
             ozvuk.speak(f'Поняла, {name}! Вы хотите использовать зайцев net. Напишите мне название песни.') 
-            fgj = input()
+            fgj = ''
+            if action_micro == True:
+                try:
+                    mic = spr.Recognizer()
+                    with spr.Microphone() as aud_total:
+                        aud = mic.listen(aud_total)
+                        text = mic.recognize_google(aud, language='ru-RU')
+                        fgj = text
+                except:
+                    txt = f'{name}, извините. Не расслышала. Повторите, пожалуйста.'
+            else:
+                fgj = input()
             if fgj:
                 try:
                     trn = requests.get('https://zaycev.net')
@@ -262,7 +389,18 @@ while True:
                     txt = f'{name}, произошла ошибка. Простите, пожалуйста!'
     elif 'найди фото' in a.lower() or 'yfqlb ajnj' in a.lower() or 'найди фотки' in a.lower() or 'yfqlb ajnrb' in a.lower() or 'фото' in a.lower():
         ozvuk.speak(f'{name}, уточни, какие фото искть?')
-        og = input()
+        og = ''
+        if action_micro == True:
+            try:
+                mic = spr.Recognizer()
+                with spr.Microphone() as aud_total:
+                    aud = mic.listen(aud_total)
+                    text = mic.recognize_google(aud, language='ru-RU')
+                    og = text
+            except:
+                txt = f'{name}, извините. Не расслышала. Повторите, пожалуйста.'
+        else:
+            og = input()
         if og:
             try:
                 d = requests.get('https://google.com')
@@ -286,7 +424,18 @@ while True:
                 txt = f'{name}, простите, произошла ошибка.'
     elif 'найди в поиске' in a.lower() or 'выполни поиск' in a.lower() or 'найди в интернете' in a.lower() or 'найди' in a.lower():
         ozvuk.speak(f'{name}, поняла вас. Уточните, что вам надо найти?')
-        ghe = input()
+        ghe = ''
+        if action_micro == True:
+            try:
+                mic = spr.Recognizer()
+                with spr.Microphone() as aud_total:
+                    aud = mic.listen(aud_total)
+                    text = mic.recognize_google(aud, language='ru-RU')
+                    ghe = text
+            except:
+                txt = f'{name}, извините. Не расслышала. Повторите, пожалуйста.'
+        else:
+            ghe = input()
         if ghe:
             try:
                 fs = requests.get('https://google.com')
@@ -313,7 +462,7 @@ while True:
             hf = requests.get('https://vk.com/audio')
             if hf.status_code == 200:
                 try:
-                    webbrowser.open('https://vk.com/audios') # Получи ссылку в vk.com/audios - мой плейлист
+                    webbrowser.open('https://vk.com/audios') #ссылка на ваш плейлист
                     txt = f'{name}, включила твой плейлист в VK музыке. Приятного прослушивания!'
                 except:
                     txt = f'Ой, {name}! Кажется, произошла ошибка. Простите, пожалуйста!'
@@ -322,8 +471,8 @@ while True:
                     qf = requests.get('https://music.yandex.ru')
                     if qf.status_code == 200:
                         try:
-                            webbrowser.open('https://music.yandex.ru/playlists/') # Получи ссылку в music.yandex.com/playlists - мой плейлист
-                            txt = f'{name}, включила твой плейлист в VK музыке. Приятного прослушивания!'
+                            webbrowser.open('https://music.yandex.ru/playlists/') #ссылка на ваш плейлист
+                            txt = f'{name}, включила твой плейлист в Яндекс музыке. Приятного прослушивания!'
                         except:
                             txt = f'Ой, {name}! Кажется, произошла ошибка. Простите, пожалуйста!'
                     else:
@@ -353,11 +502,22 @@ print('Выполняю код...')'''
                 pass
     elif 'сделай код' in a.lower() or 'cltkfq rjl' in a.lower() or 'сделай проект' in a.lower() or 'напиши код' in a.lower() or 'создай код' in a.lower():
         ozvuk.speak(f'{name}, поняла. Вам нужен проект. Скажите, какой проект вам нужен? Добавьте все API токены и ключи.')
-        gjh = input()
+        gjh = ''
+        if action_micro == True:
+            try:
+                mic = spr.Recognizer()
+                with spr.Microphone() as aud_total:
+                    aud = mic.listen(aud_total)
+                    text = mic.recognize_google(aud, language='ru-RU')
+                    gjh = text
+            except:
+                txt = f'{name}, извините. Не расслышала. Повторите, пожалуйста.'
+        else:
+            gjh = input()
         if gjh:
             try:
                 post1 = {
-                        'Authorization': f'Bearer {api_groq}',
+                        'Authorization': f'Bearer {api_groq},
                         'Content-Type': 'application/json'
                     }
                 post2 = {
@@ -377,7 +537,7 @@ You are a Python code generator. Your task is to create safe, working code.
                         }
                     ],
                     'temperature': 0.7,
-                    'max_tokens': 2000
+                    'max_tokens': 200
                 }
                 api_post = requests.post('https://api.groq.com/openai/v1/chat/completions', headers=post1, json=post2, timeout=30)
                 if api_post.status_code == 200:
@@ -414,7 +574,7 @@ You are a Python code generator. Your task is to create safe, working code.
                                 }
                             ],
                             'temperature': 0.7,
-                            'max_tokens': 2000
+                            'max_tokens': 200
                         }
                         api_post = requests.post('https://api.cometapi.com/v1/chat/completions', headers=post1, json=post2, timeout=30)
                         if api_post.status_code == 200:
@@ -454,7 +614,7 @@ You are a Python code generator. Your task is to create safe, working code.
                             }
                         ],
                         'temperature': 0.7,
-                        'max_tokens': 2000
+                        'max_tokens': 200
                     }
                     api_post = requests.post('https://api.cometapi.com/v1/chat/completions', headers=post1, json=post2, timeout=30)
                     if api_post.status_code == 200:
@@ -475,7 +635,18 @@ You are a Python code generator. Your task is to create safe, working code.
                     txt = f'{name}, простите! Я не смогла сделать вам проект. Проверьте интернет соединение'
     elif 'выключи' in a.lower() and 'сейчас' in a.lower():
         ozvuk.speak(f'{name}, я выключю твой компьютер. Ты уверен?')
-        uy = input()
+        uy = ''
+        if action_micro == True:
+            try:
+                mic = spr.Recognizer()
+                with spr.Microphone() as aud_total:
+                    aud = mic.listen(aud_total)
+                    text = mic.recognize_google(aud, language='ru-RU')
+                    uy = text
+            except:
+                txt = f'{name}, извините. Не расслышала. Повторите, пожалуйста.'
+        else:
+            uy = input()
         if 'да' in uy.lower() or 'yes' in uy.lower():
             ozvuk.speak(f'{name}, выключаю ваш компьтер. Возвращайтесь!')
             os.system('shutdown /s /f /t 0')
@@ -483,16 +654,44 @@ You are a Python code generator. Your task is to create safe, working code.
             txt = f'{name}, поняла. Не буду выключать пк.'
     elif 'закрой' in a.lower() and 'вкладк' in a.lower():
         ozvuk.speak(f'{name}, вы уверены? Это закроет все ваши вкладки.')
-        ig = input()
+        ig = ''
+        if action_micro == True:
+            try:
+                mic = spr.Recognizer()
+                with spr.Microphone() as aud_total:
+                    aud = mic.listen(aud_total)
+                    text = mic.recognize_google(aud, language='ru-RU')
+                    ig = text
+            except:
+                txt = f'{name}, извините. Не расслышала. Повторите, пожалуйста.'
+        else:
+            ig = input()
         if 'да' in ig.lower() or 'yes' in ig.lower():
             ozvuk.speak(f'{name}, поняла. Закрываю все вкладки.')
             os.system('powershell -c "Get-Process | Where-Object {$_.MainWindowTitle} | Stop-Process -Force"')
         else:
             txt = f'{name}, поняла. Не буду закрывать все вкладки.'
+    elif 'выключ' in a.lower() and 'микро' in a.lower():
+        txt = f'{name}, поняла. Выключила прослушку микрофона. Теперь общение со мной через консоль.'
+        action_micro = False
+    elif 'включ' in a.lower() and 'микро' in a.lower():
+        txt = f'{name}, поняла. Включила микрофон для прослушки команд.'
+        action_micro = True
     elif 'выключи' in a.lower() and 'потом' in a.lower():
         ozvuk.speak(f'{name}, поняла. Выключю ваш компьютер через время. Укажи в секундах, через сколько мне его выключить?')
         while True:
-            bu = input()
+            bu = ''
+            if action_micro == True:
+                try:
+                    mic = spr.Recognizer()
+                    with spr.Microphone() as aud_total:
+                        aud = mic.listen(aud_total)
+                        text = mic.recognize_google(aud, language='ru-RU')
+                        bu = text
+                except:
+                    txt = f'{name}, извините. Не расслышала. Повторите, пожалуйста.'
+            else:
+                bu = input()
             if 'отмена' in bu.lower() or 'отме' in bu.lower():
                 txt = f'{name}, поняла. Отменила это действие.'
                 break
@@ -527,7 +726,7 @@ You are a Python code generator. Your task is to create safe, working code.
                     }
                 ],
                 'temperature': 0.7,
-                'max_tokens': 250
+                'max_tokens': 25
             }
             postai = requests.post('https://api.groq.com/openai/v1/chat/completions', headers=post1, json=post2, timeout=30)
             if postai.status_code == 200:
@@ -552,7 +751,7 @@ You are a Python code generator. Your task is to create safe, working code.
                             }
                         ],
                         'temperature': 0.7,
-                        'max_tokens': 250
+                        'max_tokens': 25
                     }
                     api_post = requests.post('https://api.cometapi.com/v1/chat/completions', headers=post1, json=post2, timeout=30)
                     if api_post.status_code == 200:
