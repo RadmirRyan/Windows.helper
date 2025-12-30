@@ -23,7 +23,7 @@ if token:
         bot.send_message(m.chat.id, '1. /open https://your.url.com - открыть ссылку в браузере\n2. /pc_off - выключить пк сейчас.\n3. /pc_offtime (секунды) - выключить пк через n секунд. (/pc_anti - отмена)\n3. /close_all - закроет все вкладки.\nВсе, что вы делаете выполняется на вашем пк.')
     @bot.message_handler(commands=['open'])
     def open(m):
-        txt = m.text.replace('/open').strip()
+        txt = m.text.replace('/open', '').strip()
         try:
             webbrowser.open(txt)
         except:
